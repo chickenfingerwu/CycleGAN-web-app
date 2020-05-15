@@ -47,7 +47,7 @@ def style_transfer_image(request):
             #experiment_name = request.GET.get('experiment_name')
             opt = TestOptions().parse()  # get test options
             # hard-code some parameters for test
-            opt.name = "style_%s_pretrained" % style
+            opt.name = "%s2photo" % style
             opt.model = 'test'
             opt.isTrain = False
             opt.model_name = 'test'
