@@ -68,11 +68,11 @@ def style_transfer_image(request):
 
             web_dir = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch))  # define the website directory
             response_img_path = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch)) + '/images/%s_fake.png' % img_name[0]
-            print(response_img_path)
+            """print(response_img_path)
             if opt.load_iter > 0:  # load_iter is 0 by default
                 web_dir = '{:s}_iter{:d}'.format(web_dir, opt.load_iter)
             print('creating web directory', web_dir)
-            webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s' % (opt.name, opt.phase, opt.epoch))
+            webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s' % (opt.name, opt.phase, opt.epoch))"""
 
 
             if opt.eval:
@@ -87,7 +87,7 @@ def style_transfer_image(request):
                 if i % 5 == 0:  # save images to an HTML file
                     print('processing (%04d)-th image... %s' % (i, img_path))
                 save_images(webpage, visuals, img_path, aspect_ratio=opt.aspect_ratio, width=opt.display_winsize)
-            webpage.save()  # save the HTML
+            #webpage.save()  # save the HTML
 
             if os.path.exists(path):
                 os.remove(path)
