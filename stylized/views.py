@@ -8,6 +8,7 @@ from rest_framework.decorators import parser_classes
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .apps import StylizedConfig
 from .models import create_model
 from .image_models import Test
 from .data import create_dataset
@@ -52,7 +53,7 @@ def style_transfer_image(request):
             opt.isTrain = False
             opt.model_name = 'test'
             opt.no_dropout = True
-            opt.preprocess = 'scale_width_and_crop'
+            opt.preprocess = 'none'
             opt.num_threads = 0   # test code only supports num_threads = 1
             opt.batch_size = 1    # test code only supports batch_size = 1
             opt.serial_batches = True  # disable data shuffling; comment this line if results on randomly chosen images are needed.
@@ -64,7 +65,7 @@ def style_transfer_image(request):
             dataset = create_dataset(opt)  # create a dataset given opt.dataset_mode and other options
             model = create_model(opt)      # create a model given opt.model and other options
             model.setup(opt)               # regular setup: load and print networks; create schedulers
-            #result_dir = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch))
+            result_dir = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch))
 
             web_dir = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch)) # define the website directory
             response_img_path = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch)) + '/images/%s_fake.png' % img_name[0]
