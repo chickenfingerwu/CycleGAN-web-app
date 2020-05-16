@@ -57,6 +57,7 @@ ROOT_URLCONF = 'CycleGAN.urls'
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
     }
 }
 
