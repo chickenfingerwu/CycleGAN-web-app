@@ -5,3 +5,4 @@ visdom>=0.1.8.3
 djangorestframework
 django-heroku==0.3.1
 gunicorn==20.0.4
+django-cors-headers
