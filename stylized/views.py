@@ -17,7 +17,7 @@ from .util import html
 from django.core.files import File
 from PIL import Image
 import os
-import re
+import base64
 
 @api_view(['GET', 'POST'])
 @parser_classes([MultiPartParser])
@@ -97,7 +97,8 @@ def style_transfer_image(request):
 
             response_img = []
             if os.path.exists(response_img_path):
-                response_img = Image.open(response_img_path)
+                response_img = open(response_img_path, 'rb')
+                response_img = base64.b64encode(response_img.read())
                 return HttpResponse(response_img, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
