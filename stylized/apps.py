@@ -1,6 +1,6 @@
 from django.apps import AppConfig
-from .models import create_model
-from .options.test_options import TestOptions
+#from .models import create_model
+#from .options.test_options import TestOptions
 
 class StylizedConfig(AppConfig):
     name = 'stylized'
