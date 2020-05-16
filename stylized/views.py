@@ -100,6 +100,7 @@ def style_transfer_image(request):
             if os.path.exists(response_img_path):
                 response_img = open(response_img_path, 'rb')
                 response_img = base64.b64encode(response_img.read())
+                os.remove(response_img_path)
                 return HttpResponse(response_img, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
