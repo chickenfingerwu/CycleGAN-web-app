@@ -15,6 +15,8 @@ from .data import create_dataset
 from .options.test_options import TestOptions
 from .util.visualizer import save_images
 from .util import html
+from . import caching
+from django.core.cache import cache
 from django.core.files import File
 from PIL import Image
 import os
@@ -23,11 +25,6 @@ import base64
 @api_view(['GET', 'POST'])
 @parser_classes([MultiPartParser])
 def style_transfer_image(request):
-    """img = File(open('stylized/dataset/single/portrait.jpg'), 'rb')
-    text = File(open('stylized/requirements.txt'), 'rb')
-    test_obj = Test(img, text)
-    serializers = ImageSerializer(test_obj)
-    print(serializers.data)"""
     img_name = ''
 
     if request.method == 'POST':
@@ -41,34 +38,26 @@ def style_transfer_image(request):
             img_name = img_name.split('.')
             path = str(serializers.data['image'])
             print('%s_fake.png' % img_name[0])
-            """with open(path, 'wb') as f:
-                for chunk in img.chunks():
-                    f.write(chunk)"""
 
-            #experiment_name = request.GET.get('experiment_name')
-            opt = TestOptions().parse()  # get test options
-            # hard-code some parameters for test
-            opt.name = "%s2photo" % style
-            opt.model = 'test'
-            opt.isTrain = False
-            opt.model_name = 'test'
-            opt.no_dropout = True
-            opt.preprocess = 'resize_and_crop'
-            opt.num_threads = 0   # test code only supports num_threads = 1
-            opt.batch_size = 1    # test code only supports batch_size = 1
-            opt.serial_batches = True  # disable data shuffling; comment this line if results on randomly chosen images are needed.
-            opt.no_flip = True    # no flip; comment this line if results on flipped images are needed.
-            opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
-            opt.dataroot = './stylized/dataset/single'
-            #dataset = create_dataset(opt)
+            model = cache.get(caching.model_cache_key) # get model from cache
+            opt = cache.get(caching.option_cache_key)
+
+            if '%s2photo' % style != opt.name:
+                print('RELOADING')
+                opt.name = "%s2photo" % style
+                model = create_model(opt)      # create a model given opt.model and other options
+                model.setup(opt)               # regular setup: load and print networks; create schedulers
+
+                cache.set(caching.model_cache_key, model, None) # save in the cache
+                cache.set(caching.option_cache_key, opt, None)
 
             dataset = create_dataset(opt)  # create a dataset given opt.dataset_mode and other options
-            model = create_model(opt)      # create a model given opt.model and other options
-            model.setup(opt)               # regular setup: load and print networks; create schedulers
+#           model = create_model(opt)      # create a model given opt.model and other options
             result_dir = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch))
 
             web_dir = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch)) # define the website directory
             response_img_path = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch)) + '/images/%s_fake.png' % img_name[0]
+            img_real_path = os.path.join(opt.results_dir, opt.name, '{}_{}'.format(opt.phase, opt.epoch)) + '/images/%s_real.png' % img_name[0]
             print(response_img_path)
             if opt.load_iter > 0:  # load_iter is 0 by default
                 web_dir = '{:s}_iter{:d}'.format(web_dir, opt.load_iter)
@@ -104,6 +93,8 @@ def style_transfer_image(request):
                 return HttpResponse(response_img, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            if os.path.exists(img_real_path):
+                os.remove(response_img_path)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
     #elif request.method == 'POST':
     return HttpResponse('Hello world!')
