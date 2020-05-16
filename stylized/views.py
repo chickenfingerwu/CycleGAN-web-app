@@ -53,7 +53,7 @@ def style_transfer_image(request):
             opt.isTrain = False
             opt.model_name = 'test'
             opt.no_dropout = True
-            opt.preprocess = 'none'
+            opt.preprocess = 'resize_and_crop'
             opt.num_threads = 0   # test code only supports num_threads = 1
             opt.batch_size = 1    # test code only supports batch_size = 1
             opt.serial_batches = True  # disable data shuffling; comment this line if results on randomly chosen images are needed.
